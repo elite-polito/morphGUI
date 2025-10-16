@@ -1,0 +1,45 @@
+/* Basic styling for the loading page */
+.loading-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 85vh;
+    background-color: 'transparent';
+    color: #333;
+    font-family: Arial, sans-serif;
+  }
+  
+  /* Spinner animation */
+  .spinner {
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Spinner rotation */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Text fade-in and fade-out animations */
+  .loading-text {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    transition: opacity 0.5s ease-in-out;
+  }
+  
+  /* Fade-out animation when text is changing */
+  .fade-out {
+    opacity: 0;
+  }
+  
+  /* Fade-in animation when new text appears */
+  .fade-in {
+    opacity: 1;
+  }
+  

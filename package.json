@@ -1,0 +1,22 @@
+{
+  "name": "ui-personalization-heroku",
+  "version": "1.0.0",
+  "description": "Full-stack UI personalization app with AI-powered UI generation",
+  "main": "backend/server.js",
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build": "cd frontend && npm ci --include=dev && npm run build",
+    "start": "cd backend && npm install && npm start",
+    "dev": "concurrently \"cd backend && npm start\" \"cd frontend && npm run dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

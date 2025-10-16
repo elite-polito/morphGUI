@@ -1,0 +1,9 @@
+Procfile
+deploy.sh
+.env
+*.zip
+*.iso
+*.dmg
+StudioUtente/
+node_modules/
+.DS_Store
