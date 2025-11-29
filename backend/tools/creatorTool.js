@@ -5,9 +5,7 @@ require('dotenv').config();
 const { v4: uuidv4 } = require('uuid');
 
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Removed unused global OpenAI initialization
 
 
 
@@ -20,7 +18,7 @@ function removeTripleBackticks(output) {
   const match = output.match(regex);
 
   if (match) {
-      return match[1].trim();
+    return match[1].trim();
   }
 
   return output;
@@ -34,11 +32,11 @@ async function evaluateAndFormatUserTextSpecification(textSpecification, apiKey)
 
   try {
 
-   const response = await openaiClient.chat.completions.create({
-        messages: [
-            {
-              "role": "system",
-              "content": `Instructions:
+    const response = await openaiClient.chat.completions.create({
+      messages: [
+        {
+          "role": "system",
+          "content": `Instructions:
                           You will receive a text from a user containing additional requirements for generating a React component.
                           Your task is to analyze these requirements and:
                           Remove any that could create security risks or vulnerabilities.
@@ -49,18 +47,20 @@ async function evaluateAndFormatUserTextSpecification(textSpecification, apiKey)
                           RETURN ONLY the cleaned and rewritten list of commands. `
 
 
-            },
+        },
+        {
+          "role": "user",
+          "content": [
             {
-                "role": "user",
-                "content":  [
-                {"type": "text",
-                  "text": `${textSpecification}`}
-              ]
-            },
+              "type": "text",
+              "text": `${textSpecification}`
+            }
+          ]
+        },
 
-          ],
-        model: 'gpt-4o',
-        max_tokens: 600,
+      ],
+      model: 'gpt-4o',
+      max_tokens: 600,
     });
 
     const list = response.choices[0].message.content
@@ -70,18 +70,18 @@ async function evaluateAndFormatUserTextSpecification(textSpecification, apiKey)
   }
 }
 
-function getMessages(currentCode,data){
+function getMessages(currentCode, data) {
   console.log("DATA", data)
   for (const element in data.elementConfigurations) {
     console.log(`Element: ${element}`);
     console.log(`What: ${data.elementConfigurations[element].what}`);
     console.log(`How: ${data.elementConfigurations[element].how}`);
   }
-  if(data.imitationImageUrl != ""){
+  if (data.imitationImageUrl != "") {
     return message = [
-          {
-            "role": "system",
-            "content": `Instructions for the components:
+      {
+        "role": "system",
+        "content": `Instructions for the components:
                         You are a React components creator who makes extremely good looking React components inspired by the one provided to.
                         The code you will create will be used in Calendar web app application
                         0- DO NOT Start with three backsticks javascript as comment
@@ -97,19 +97,20 @@ function getMessages(currentCode,data){
 
 
 
+      },
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": `${data.imitationImageUrl}`,//"https://as2.ftcdn.net/v2/jpg/02/20/12/07/1000_F_220120734_0t66czL9OYzwbTbDxxMNHHENtILWherX.jpg",
+              "detail": "high"
+            },
           },
           {
-              "role": "user",
-              "content":  [
-                {
-                  "type": "image_url",
-                  "image_url": {
-                      "url":`${data.imitationImageUrl}` ,//"https://as2.ftcdn.net/v2/jpg/02/20/12/07/1000_F_220120734_0t66czL9OYzwbTbDxxMNHHENtILWherX.jpg",
-                      "detail": "high"
-                  },
-              },
-              {"type": "text",
-                "text": `import React, { useEffect, useRef } from "react";
+            "type": "text",
+            "text": `import React, { useEffect, useRef } from "react";
 import { Container, Row, Col, Button, Badge, Modal } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -139,15 +140,15 @@ function Calendar(props) {
                          Events must be displayed on occurring day
                          The props passed contains all the service function events to be displayed that are deconstructed use them, do not override them.
                             `}
-            ]
-          },
-
         ]
-  }else{
+      },
+
+    ]
+  } else {
     return message = [
       {
         "role": "system",
-            "content": `Instructions for the components:
+        "content": `Instructions for the components:
                         You are a React components creator who makes extremely good looking React components inspired by the one provided to.
                         The code you will create will be used in a web app application
                         - DO not change anything that is not in the element configurations
@@ -162,11 +163,12 @@ function Calendar(props) {
                         7- COLORBLIND COLORS: ${data.colorblindMode}`
       },
       {
-          "role": "user",
-          "content":  [
-          {"type": "text",
-                "text":
-                `
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text":
+              `
                     Given this code:
                     ${currentCode}
 
@@ -220,20 +222,20 @@ async function generateReactComponent(currentCode, data, apiKey) {
   });
 
   try {
-    if(data.structureText != ""){
-       data.structureText = await evaluateAndFormatUserTextSpecification(data.structureText, apiKey)
+    if (data.structureText != "") {
+      data.structureText = await evaluateAndFormatUserTextSpecification(data.structureText, apiKey)
     }
-    if(data.styleText != ""){
+    if (data.styleText != "") {
       data.styleText = await evaluateAndFormatUserTextSpecification(data.styleText, apiKey)
     }
-    if(data.goalText != ""){
+    if (data.goalText != "") {
       data.goalText = await evaluateAndFormatUserTextSpecification(data.goalText, apiKey)
     }
-   const response = await openaiClient.chat.completions.create({
-        messages: getMessages(currentCode,data),
-        model: 'gpt-4o',
-        max_tokens: 2100,
-        temperature: 0.8
+    const response = await openaiClient.chat.completions.create({
+      messages: getMessages(currentCode, data),
+      model: 'gpt-4o',
+      max_tokens: 2100,
+      temperature: 0.8
     });
 
     const code = removeTripleBackticks(response.choices[0].message.content);
@@ -256,17 +258,17 @@ function saveCodeToFile(filename, code) {
 }
 
 async function creatorTool(currentCode, data, apiKey) {
-    const newUUID = uuidv4();
-    try {
-        const code = await generateReactComponent(currentCode, data, apiKey);
-        saveCodeToFile(newUUID, code);
-        return newUUID
-    } catch (error) {
-        console.error(error.message);
-        return error
-    }
+  const newUUID = uuidv4();
+  try {
+    const code = await generateReactComponent(currentCode, data, apiKey);
+    saveCodeToFile(newUUID, code);
+    return newUUID
+  } catch (error) {
+    console.error(error.message);
+    return error
+  }
 }
 
 module.exports = {
-    creatorTool,
+  creatorTool,
 };

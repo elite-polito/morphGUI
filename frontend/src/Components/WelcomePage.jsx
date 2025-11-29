@@ -31,7 +31,7 @@ function WelcomePage({ onStart }) {
     // Basic validation for OpenAI API key format
     const basicValid = key.startsWith('sk-') && key.length > 20;
     setIsValidKey(basicValid);
-    
+
     // Clear launch message when user types
     if (launchMessage) {
       setLaunchMessage('');
@@ -40,7 +40,7 @@ function WelcomePage({ onStart }) {
 
   const handleStart = async () => {
     if (!isValidKey) return;
-    
+
     // If we have an existing key, skip validation and launch directly
     if (hasExistingKey && !showInputForm) {
       setLaunchMessage('✅ Using existing API key. Launching MorphGUI...');
@@ -49,23 +49,23 @@ function WelcomePage({ onStart }) {
       }, 1000);
       return;
     }
-    
+
     setIsLaunching(true);
     setLaunchMessage('Validating API key...');
-    
+
     try {
       // Validate API key before proceeding
-      const response = await fetch('http://localhost:3001/api/validate-api-key', {
+      const response = await fetch('/api/validate-api-key', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ apiKey }),
       });
-      
+
       const result = await response.json();
-      
+
       if (result.valid) {
         setLaunchMessage('✅ API key validated! Launching MorphGUI...');
-        
+
         // Small delay to show success message
         setTimeout(() => {
           // Save API key to localStorage
@@ -112,11 +112,11 @@ function WelcomePage({ onStart }) {
                 <div className="welcome-icon mb-4">
                   <WiStars size={80} color="#6f42c1" />
                 </div>
-                
+
                 <h1 className="welcome-title mb-4">
                   MorphGUI
                 </h1>
-                
+
                 <p className="welcome-subtitle mb-5">
                   Note: This demo version may differ from the one shown in the article, as it has been
                   adapted specifically for demonstration purposes.
@@ -127,7 +127,7 @@ function WelcomePage({ onStart }) {
                     <FaKey size={24} className="me-2" style={{ color: '#6f42c1' }} />
                     <h5 className="mb-0">OpenAI API Key</h5>
                   </div>
-                  
+
                   {hasExistingKey && !showInputForm ? (
                     // Show existing key status
                     <div className="existing-key-section">
@@ -137,15 +137,15 @@ function WelcomePage({ onStart }) {
                           <span className="text-success fw-medium">API key is configured and ready</span>
                         </div>
                         <div className="d-flex gap-2">
-                          <Button 
-                            variant="outline-secondary" 
+                          <Button
+                            variant="outline-secondary"
                             size="sm"
                             onClick={handleChangeKey}
                           >
                             Change Key
                           </Button>
-                          <Button 
-                            variant="outline-danger" 
+                          <Button
+                            variant="outline-danger"
                             size="sm"
                             onClick={handleClearKey}
                           >
@@ -193,9 +193,9 @@ function WelcomePage({ onStart }) {
                   )}
                 </div>
 
-                <Button 
-                  variant="primary" 
-                  size="lg" 
+                <Button
+                  variant="primary"
+                  size="lg"
                   className="start-button"
                   onClick={handleStart}
                   disabled={!isValidKey || isLaunching}
@@ -212,13 +212,13 @@ function WelcomePage({ onStart }) {
                     </>
                   )}
                 </Button>
-                
+
                 {launchMessage && (
                   <div className={`launch-message mt-3 ${launchMessage.includes('✅') ? 'success' : 'error'}`}>
                     {launchMessage}
                   </div>
                 )}
-                
+
                 <p className="mt-3 small text-muted">
                   No registration required • Start transforming immediately
                 </p>

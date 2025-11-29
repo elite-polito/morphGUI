@@ -4,19 +4,19 @@ import { WiStars } from 'react-icons/wi';
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 import './NavbarComponent.css';
-import { FaBackward , FaTrash} from "react-icons/fa";
+import { FaBackward, FaTrash } from "react-icons/fa";
 import { LuDatabaseBackup } from "react-icons/lu"
 // Removed useAuth import - no authentication needed
 import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { FaBroom } from "react-icons/fa";
 
-const calendarElements = ["-- Select an Element --", "Weekly Calendar View","Navigation Buttons", "Events Badge","Calendar Header","Custom Component"];
+const calendarElements = ["-- Select an Element --", "Weekly Calendar View", "Navigation Buttons", "Events Badge", "Calendar Header", "Custom Component"];
 const ecommerceElements = ["-- Select an Element --", "Product Grid", "Product Cards", "Search Bar", "Category Filter", "Sort Dropdown", "Pagination", "Product Modal", "Custom Component"];
 const dashboardElements = ["-- Select an Element --", "Revenue Chart", "Metric Cards", "Sales Chart", "Region Chart", "Product Table", "Chart Legend", "Color Scheme", "Custom Component"];
-let MAX_GEN=10
+let MAX_GEN = 10
 
 const getAppTypeDisplayName = (type) => {
-  switch(type) {
+  switch (type) {
     case 'calendar': return '📅 Calendar';
     case 'ecommerce': return '🛒 E-commerce';
     case 'dashboard': return '📊 Dashboard';
@@ -25,7 +25,7 @@ const getAppTypeDisplayName = (type) => {
 };
 
 const getElementsForAppType = (type) => {
-  switch(type) {
+  switch (type) {
     case 'calendar': return calendarElements;
     case 'ecommerce': return ecommerceElements;
     case 'dashboard': return dashboardElements;
@@ -33,7 +33,7 @@ const getElementsForAppType = (type) => {
   }
 };
 
-function NavbarComponent({user,generating, setGenerating, setUser, experiment, appType, onAppTypeChange, isSwitchingApp}) {
+function NavbarComponent({ user, generating, setGenerating, setUser, experiment, appType, onAppTypeChange, isSwitchingApp }) {
   // Removed authentication - no login/logout needed
   const [genCount, setGenCount] = useState(0)
   const [textSizeRange, setTextSizeRange] = useState([12, 32]);
@@ -45,7 +45,7 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
   const [styleText, setStyleText] = useState('');
   const [imitationImageUrl, setImitationImageUrl] = useState('');
   const [goalText, setgoalText] = useState('');
-  const [imageError, setImageError] =useState(false)
+  const [imageError, setImageError] = useState(false)
   const [elementConfigurations, setElementConfigurations] = useState({});
   const [selectedElements, setSelectedElements] = useState([]);
   const [hasPreviousUI, setHasPreviousUI] = useState(false);
@@ -62,7 +62,7 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
   };
   const handleElementSelect = (event) => {
     const selectedElement = event.target.value;
-    if(selectedElement== "-- Select an Element --"){
+    if (selectedElement == "-- Select an Element --") {
       return
     }
 
@@ -119,7 +119,7 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
       const count = localStorage.getItem(`${appType}_generation_count_${user.user_id}`) || '0';
       setGenCount(parseInt(count));
     } catch (err) {
-        console.log(err)
+      console.log(err)
     }
   };
 
@@ -128,10 +128,10 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
     setHasPreviousUI(!!previousCode);
   };
 
-  useEffect(()=>{
-      fetchGenerationCount();
-      checkPreviousUI();
-  },[appType])
+  useEffect(() => {
+    fetchGenerationCount();
+    checkPreviousUI();
+  }, [appType])
 
   // Clear selected elements when switching apps
   useEffect(() => {
@@ -141,12 +141,12 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(imitationImageUrl != ""){
+    if (imitationImageUrl != "") {
       const cleanedUrl = getCleanedImageURL(imitationImageUrl)
-      if(!cleanedUrl.isValid){
+      if (!cleanedUrl.isValid) {
         setImageError(true)
         return
-      }else{
+      } else {
         setImitationImageUrl(cleanedUrl.cleanUrl)
       }
     }
@@ -164,60 +164,60 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
       elementConfigurations
     };
 
-    try{
-        setGenerating(true);
-        
-        // Get current UI code to use as base for generation
-        const currentCode = localStorage.getItem(`${appType}_component_${user.user_id}`);
-        
-        // Save current UI as previous before generating new one
-        if (currentCode) {
-          localStorage.setItem(`${appType}_component_prev_${user.user_id}`, currentCode);
-        }
-        
-        // Get API key from localStorage
-        const apiKey = localStorage.getItem('openai_api_key');
-        if (!apiKey) {
-          throw new Error('OpenAI API key not found. Please restart the application.');
-        }
+    try {
+      setGenerating(true);
 
-        const response = await fetch(`http://localhost:3001/api/update-customization?userId=${user.user_id}&appType=${appType}`, {
-                                      method: 'POST',
-                                      headers: { 'Content-Type': 'application/json' },
-                                      body: JSON.stringify({ data, apiKey, currentCode }),
-                                    })
-        if (!response.ok) {
-          setGenerating(false);
-            throw new Error(`Error: ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        const generatedCode = responseData.code;
-        
-        // Save new generated code as current UI
-        localStorage.setItem(`${appType}_component_${user.user_id}`, generatedCode);
-        
-        // Dispatch custom event to notify DynamicComponent of the update
-        window.dispatchEvent(new CustomEvent('componentUpdated'));
-        
-        // Update generation count in localStorage
-        const currentCount = parseInt(localStorage.getItem(`${appType}_generation_count_${user.user_id}`) || '0');
-        localStorage.setItem(`${appType}_generation_count_${user.user_id}`, (currentCount + 1).toString());
-        setGenCount(currentCount + 1);
+      // Get current UI code to use as base for generation
+      const currentCode = localStorage.getItem(`${appType}_component_${user.user_id}`);
 
-        // Update previous UI availability
-        checkPreviousUI();
+      // Save current UI as previous before generating new one
+      if (currentCode) {
+        localStorage.setItem(`${appType}_component_prev_${user.user_id}`, currentCode);
+      }
 
+      // Get API key from localStorage
+      const apiKey = localStorage.getItem('openai_api_key');
+      if (!apiKey) {
+        throw new Error('OpenAI API key not found. Please restart the application.');
+      }
+
+      const response = await fetch(`/api/update-customization?userId=${user.user_id}&appType=${appType}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data, apiKey, currentCode }),
+      })
+      if (!response.ok) {
         setGenerating(false);
+        throw new Error(`Error: ${response.statusText}`);
+      }
 
-    }catch(error){
+      const responseData = await response.json();
+      const generatedCode = responseData.code;
+
+      // Save new generated code as current UI
+      localStorage.setItem(`${appType}_component_${user.user_id}`, generatedCode);
+
+      // Dispatch custom event to notify DynamicComponent of the update
+      window.dispatchEvent(new CustomEvent('componentUpdated'));
+
+      // Update generation count in localStorage
+      const currentCount = parseInt(localStorage.getItem(`${appType}_generation_count_${user.user_id}`) || '0');
+      localStorage.setItem(`${appType}_generation_count_${user.user_id}`, (currentCount + 1).toString());
+      setGenCount(currentCount + 1);
+
+      // Update previous UI availability
+      checkPreviousUI();
+
+      setGenerating(false);
+
+    } catch (error) {
       setGenerating(false);
       console.error('Error updating customization status:', error)
     }
 
   };
 
-  const handleReset = async ()=>{
+  const handleReset = async () => {
     try {
       setGenerating(true)
 
@@ -228,109 +228,109 @@ function NavbarComponent({user,generating, setGenerating, setUser, experiment, a
       }
 
       // Get default component code from API with current app type
-      const response = await fetch(`http://localhost:3001/api/default-component-code?appType=${appType}`);
+      const response = await fetch(`/api/default-component-code?appType=${appType}`);
       if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
+        throw new Error(`Error: ${response.statusText}`);
       }
-      
+
       const data = await response.json();
       const defaultCode = data.code;
-      
+
       // Save default code as current UI
       localStorage.setItem(`${appType}_component_${user.user_id}`, defaultCode);
-      
+
       // Dispatch custom event to notify DynamicComponent of the update
       window.dispatchEvent(new CustomEvent('componentUpdated'));
-      
+
       // Update previous UI availability
       checkPreviousUI();
-      
+
       setGenerating(false)
-     }catch(error){
-       console.error(`Fatal reset component:`, error);
-       setGenerating(false)
-     }
-}
-
-const handlePrevious = async ()=>{
-  try {
-    setGenerating(true)
-    
-    // Get previous code from localStorage
-    const previousCode = localStorage.getItem(`${appType}_component_prev_${user.user_id}`);
-    
-    if (!previousCode) {
-      throw new Error('No previous code found');
+    } catch (error) {
+      console.error(`Fatal reset component:`, error);
+      setGenerating(false)
     }
-    
-    // Get current code to save as new previous (for potential future "previous" calls)
-    const currentCode = localStorage.getItem(`${appType}_component_${user.user_id}`);
-    
-    // Restore previous code as current
-    localStorage.setItem(`${appType}_component_${user.user_id}`, previousCode);
-    
-    // Save current code as the new previous (so we can go back to it if needed)
-    if (currentCode) {
-      localStorage.setItem(`${appType}_component_prev_${user.user_id}`, currentCode);
+  }
+
+  const handlePrevious = async () => {
+    try {
+      setGenerating(true)
+
+      // Get previous code from localStorage
+      const previousCode = localStorage.getItem(`${appType}_component_prev_${user.user_id}`);
+
+      if (!previousCode) {
+        throw new Error('No previous code found');
+      }
+
+      // Get current code to save as new previous (for potential future "previous" calls)
+      const currentCode = localStorage.getItem(`${appType}_component_${user.user_id}`);
+
+      // Restore previous code as current
+      localStorage.setItem(`${appType}_component_${user.user_id}`, previousCode);
+
+      // Save current code as the new previous (so we can go back to it if needed)
+      if (currentCode) {
+        localStorage.setItem(`${appType}_component_prev_${user.user_id}`, currentCode);
+      }
+
+      // Dispatch custom event to notify DynamicComponent of the update
+      window.dispatchEvent(new CustomEvent('componentUpdated'));
+
+      // Update previous UI availability
+      checkPreviousUI();
+
+      setGenerating(false)
+
+    } catch (error) {
+      console.error(`Fatal previous component:`, error);
+      setGenerating(false)
     }
-    
-    // Dispatch custom event to notify DynamicComponent of the update
-    window.dispatchEvent(new CustomEvent('componentUpdated'));
-    
-    // Update previous UI availability
-    checkPreviousUI();
-    
-    setGenerating(false)
+  }
 
-   }catch(error){
-     console.error(`Fatal previous component:`, error);
-     setGenerating(false)
-   }
-}
+  const handleClean = async () => {
+    try {
+      setGenerating(true)
 
-const handleClean = async () => {
-  try {
-    setGenerating(true)
-    
-    // Clear all localStorage data for this user and app type
-    localStorage.removeItem(`${appType}_component_${user.user_id}`);
-    localStorage.removeItem(`${appType}_component_prev_${user.user_id}`);
-    localStorage.removeItem(`${appType}_generation_count_${user.user_id}`);
-    
-    // Get default component code from API with current app type
-    const response = await fetch(`http://localhost:3001/api/default-component-code?appType=${appType}`);
-    if (!response.ok) {
+      // Clear all localStorage data for this user and app type
+      localStorage.removeItem(`${appType}_component_${user.user_id}`);
+      localStorage.removeItem(`${appType}_component_prev_${user.user_id}`);
+      localStorage.removeItem(`${appType}_generation_count_${user.user_id}`);
+
+      // Get default component code from API with current app type
+      const response = await fetch(`/api/default-component-code?appType=${appType}`);
+      if (!response.ok) {
         throw new Error(`Error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const defaultCode = data.code;
+
+      // Save default code to localStorage
+      localStorage.setItem(`${appType}_component_${user.user_id}`, defaultCode);
+
+      // Reset generation count
+      setGenCount(0);
+
+      // Dispatch custom event to notify DynamicComponent of the update
+      window.dispatchEvent(new CustomEvent('componentUpdated'));
+
+      // Update previous UI availability
+      checkPreviousUI();
+
+      setGenerating(false)
+
+    } catch (error) {
+      console.error(`Fatal clean component:`, error);
+      setGenerating(false)
     }
-    
-    const data = await response.json();
-    const defaultCode = data.code;
-    
-    // Save default code to localStorage
-    localStorage.setItem(`${appType}_component_${user.user_id}`, defaultCode);
-    
-    // Reset generation count
-    setGenCount(0);
-    
-    // Dispatch custom event to notify DynamicComponent of the update
-    window.dispatchEvent(new CustomEvent('componentUpdated'));
-    
-    // Update previous UI availability
-    checkPreviousUI();
-    
-    setGenerating(false)
-    
-   }catch(error){
-     console.error(`Fatal clean component:`, error);
-     setGenerating(false)
-   }
-}
-// Removed logout functionality - no authentication needed
+  }
+  // Removed logout functionality - no authentication needed
   return (
     <Navbar expand={false} className="custom-navbar mb-3">
       <Container fluid>
         <div className="d-flex align-items-center">
-         
+
           <Navbar.Brand href="#" className="navbar-brand">
             MorphGUI
           </Navbar.Brand>
@@ -339,20 +339,20 @@ const handleClean = async () => {
               Select App
             </small>
             <Dropdown >
-              <Dropdown.Toggle 
-                variant="outline-light" 
-                id="app-type-dropdown" 
+              <Dropdown.Toggle
+                variant="outline-light"
+                id="app-type-dropdown"
                 className="app-type-dropdown"
                 disabled={isSwitchingApp || generating}
               >
                 {isSwitchingApp ? (
                   <>
-                    
+
                     <span className='text-muted'>Switching </span>
                   </>
                 ) : generating ? (
                   <>
-                     <span className='text-muted'>Generating </span>
+                    <span className='text-muted'>Generating </span>
                   </>
                 ) : (
                   getAppTypeDisplayName(appType)
@@ -360,21 +360,21 @@ const handleClean = async () => {
               </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Header className="text-white small">Choose your app type</Dropdown.Header>
-                <Dropdown.Item 
+                <Dropdown.Item
                   onClick={() => onAppTypeChange('calendar')}
                   className={appType === 'calendar' ? 'active' : ''}
                 >
                   📅 Calendar App
                   <small className="d-block text-muted">Schedule and manage events</small>
                 </Dropdown.Item>
-                <Dropdown.Item 
+                <Dropdown.Item
                   onClick={() => onAppTypeChange('ecommerce')}
                   className={appType === 'ecommerce' ? 'active' : ''}
                 >
                   🛒 E-commerce App
                   <small className="d-block text-muted">Product catalog and shopping</small>
                 </Dropdown.Item>
-                <Dropdown.Item 
+                <Dropdown.Item
                   onClick={() => onAppTypeChange('dashboard')}
                   className={appType === 'dashboard' ? 'active' : ''}
                 >
@@ -386,11 +386,11 @@ const handleClean = async () => {
           </div>
         </div>
         <div className="d-flex justify-content-end align-items-center">
-          <Navbar.Toggle 
-            aria-controls="offcanvasNavbar" 
+          <Navbar.Toggle
+            aria-controls="offcanvasNavbar"
             className="navbar-toggle"
             disabled={isSwitchingApp || generating}
-            style={{ 
+            style={{
               opacity: (isSwitchingApp || generating) ? 0.5 : 1,
               cursor: (isSwitchingApp || generating) ? 'not-allowed' : 'pointer'
             }}
@@ -415,7 +415,7 @@ const handleClean = async () => {
                 <Accordion.Item eventKey="0">
                   <Accordion.Header>Static Settings</Accordion.Header>
                   <Accordion.Body>
-                    <Form.Label style={{fontWeight: 'bold', fontSize: 17}}>Typography</Form.Label>
+                    <Form.Label style={{ fontWeight: 'bold', fontSize: 17 }}>Typography</Form.Label>
                     <Form.Group controlId="textSizeRange">
                       <Form.Label>Text Size</Form.Label>
                       <Slider
@@ -441,7 +441,7 @@ const handleClean = async () => {
                       </Form.Control>
                     </Form.Group>
 
-                    <Form.Label style={{fontWeight: 'bold', fontSize: 17}} className='mt-3'>Colors</Form.Label>
+                    <Form.Label style={{ fontWeight: 'bold', fontSize: 17 }} className='mt-3'>Colors</Form.Label>
                     <Row>
                       <Col>
 
@@ -473,10 +473,10 @@ const handleClean = async () => {
                 <Accordion.Item eventKey="1">
                   <Accordion.Header>Dynamic Settings</Accordion.Header>
                   <Accordion.Body>
-                  <Form.Group controlId="elementSelect" className="mb-3">
-                      <Form.Label style={{fontWeight: 'bold', fontSize: 20}} className='mt-3'>Personalize!</Form.Label>
-                      <Form.Control as="select"  value={getElementsForAppType(appType)[0]}
-                          onChange={handleElementSelect}>
+                    <Form.Group controlId="elementSelect" className="mb-3">
+                      <Form.Label style={{ fontWeight: 'bold', fontSize: 20 }} className='mt-3'>Personalize!</Form.Label>
+                      <Form.Control as="select" value={getElementsForAppType(appType)[0]}
+                        onChange={handleElementSelect}>
                         {getElementsForAppType(appType).filter(el => !selectedElements.includes(el)).map((el, idx) => (
                           <option key={idx} value={el}>{el}</option>
                         ))}
@@ -490,11 +490,11 @@ const handleClean = async () => {
                       <div key={idx} className="mb-4">
 
                         <Form.Group controlId={`cosa-${element}`} className="mb-2">
-                          <Form.Label style={{fontWeight: 'bold', fontSize: 16}} className='mt-3'>
+                          <Form.Label style={{ fontWeight: 'bold', fontSize: 16 }} className='mt-3'>
                             {element}
-                          <Button variant="link" onClick={() => handleRemoveElement(element)}>
-                            <IoMdRemoveCircleOutline color='#DB4437'size={25} className='pb-1'/>
-                          </Button>
+                            <Button variant="link" onClick={() => handleRemoveElement(element)}>
+                              <IoMdRemoveCircleOutline color='#DB4437' size={25} className='pb-1' />
+                            </Button>
                           </Form.Label>
 
                           <br></br>
@@ -512,7 +512,7 @@ const handleClean = async () => {
                           <Form.Control
                             type="text"
                             value={elementConfigurations[element]?.how || ''}
-                          onChange={(e) => handleConfigurationChange(element, 'how', e.target.value)}
+                            onChange={(e) => handleConfigurationChange(element, 'how', e.target.value)}
                           />
                         </Form.Group>
                       </div>
@@ -520,7 +520,7 @@ const handleClean = async () => {
                   </Accordion.Body>
                 </Accordion.Item>
 
-               {/* <Accordion.Item eventKey="2">
+                {/* <Accordion.Item eventKey="2">
                   <Accordion.Header>AI Imitation</Accordion.Header>
                   <Accordion.Body>
                     <Form.Group controlId="imitationImageUrl">
@@ -539,16 +539,16 @@ const handleClean = async () => {
                 </Accordion.Item>*/}
 
                 <Button className="generate-button mt-3" type="submit" disabled={generating}>
-                 Generate < WiStars color="white" size={40} />
+                  Generate < WiStars color="white" size={40} />
                 </Button>
               </Form>
-              <Button variant="warning" className="restore-button mt-3" disabled={generating || !hasPreviousUI} onClick={()=>handlePrevious()}>
-                  Previous {hasPreviousUI ? <FaBackward color="white" size={30} className='ps-1'/> : <FaBackward color="#6c757d" size={30} className='ps-1'/>}
-               </Button>
-              <Button variant="danger" className="restore-button mt-3" disabled={generating} onClick={()=>handleClean()}>
-                  Restore <LuDatabaseBackup color="white" size={30} className='ps-1'/>
-               </Button>
-              
+              <Button variant="warning" className="restore-button mt-3" disabled={generating || !hasPreviousUI} onClick={() => handlePrevious()}>
+                Previous {hasPreviousUI ? <FaBackward color="white" size={30} className='ps-1' /> : <FaBackward color="#6c757d" size={30} className='ps-1' />}
+              </Button>
+              <Button variant="danger" className="restore-button mt-3" disabled={generating} onClick={() => handleClean()}>
+                Restore <LuDatabaseBackup color="white" size={30} className='ps-1' />
+              </Button>
+
             </Accordion>
           </Offcanvas.Body>
         </Navbar.Offcanvas>
